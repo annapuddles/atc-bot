@@ -262,6 +262,7 @@ function respondToATCMessage(message) {
 		}
 	}
 
+	/* Weather */
 	if ((matches = matchesPattern(message, weatherCheckPattern)).length > 0) {
 		const callsign = matches[0][1]
 
