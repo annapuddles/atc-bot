@@ -97,7 +97,6 @@ function parseMetar(raw) {
 	const altimeter = alt.substring(1, 3) + '.' + alt.substring(3, 5)
 
 	return {
-		raw: raw,
 		icao: icao,
 		time: {
 			day: day,
