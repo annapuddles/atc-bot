@@ -52,3 +52,13 @@ You must include the commas between each part.
 | Take off | "SLYN  tower, N12345, requesting clearance for takeoff." | "N12345, SLYN TOWER, CLEARED FOR TAKE OFF." |
 | Landing | "SLYN tower, N12345, requesting clearance to land." | "N12345, SLYN TOWER, LANDING APPROVED." |
 | Landing on helipad | "SLYN tower, N12345, requesting clearance to land on helipad H1." | "N12345, SLYN TOWER, LANDING APPROVED ON HELIPAD H1." |
+
+# Example
+
+A working example of this bot is running at Hyena Heliport (SLYN), and can be interacted with using the prefix `SLYN` on the following GridTalkie channels:
+
+| Channel | Description                 |
+|---------|-----------------------------|
+| #12755  | Hyena Heliport (SLYN) tower |
+| #12270  | Gridwide ATC                |
+| #11920  | Blake Sea ATC               |
