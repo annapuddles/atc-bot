@@ -1,0 +1,44 @@
+# Path to use for the log file
+log: atc.log
+
+# Corrade configuration
+corrade:
+  # The Corrade MQTT server URL
+  mqtt: https://127.0.0.1:1883
+
+  # The Corrade group for commands
+  group: MyGroup
+
+  # The corrade password for commands
+  password: MyGroupPassword
+
+# GridTalkie config
+gridtalkie:
+  # Mapping of GridTalkie channels to the SL text channels that the viewer
+  # will use to interact with them.
+  channels:
+    12755: 11
+    12270-Gridwide ATC: 12
+    11920-BLAKE: 13
+
+# ATC bot configuration
+atc:
+  # The handle to use on GridTalkie
+  handle: ICAO TOWER
+
+  # The prefix that messages must start with for the bot to reply
+  prefix: ICAO
+
+  # Extra information given with departure clearances
+  departureInfo: ""
+
+  # Extra information given with approach clearances
+  approachInfo: ""
+
+# Shergood METAR config
+metar:
+  # The ICAO of the airport
+  icao: ICAO
+  
+  # How often in milliseconds to update the METAR data
+  update: 300000
