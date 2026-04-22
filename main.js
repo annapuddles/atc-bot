@@ -1,7 +1,7 @@
 /* ATC bot bridge between Corrade and GridTalkie. */
 
 const mqtt = require('mqtt')
-const { createLogger, format, transports } = require('winston')
+const winston = require('winston')
 const fs = require('fs')
 const path = require('path')
 const https = require('https')
@@ -44,6 +44,22 @@ const weatherCheckPattern = basicATCPattern('weather')
 const landingHelipadPattern = new RegExp(`^${config.atc.prefix} ?.*, ?(.*),.*\\bland(?:ing)?\\b.*\\bhelipad ([0-9a-z]+)\\b.*$`, 'gi')
 const otherCallsignPattern = new RegExp(`^${config.atc.prefix} ?.*, ?(.*),.*$`, 'gi')
 const otherPattern = new RegExp(`^${config.atc.prefix}.*$`, 'gi')
+
+/* Create a logger instance to log messages to console and a log file. */
+const logger = winston.createLogger({
+	format: winston.format.combine(
+		winston.format.timestamp({
+			format: 'YYYY-MM-DD HH:mm:ss'
+		}),
+		winston.format.printf(info => `${info.timestamp} ${info.level}: ${info.message}`)
+	),
+	transports: [
+		new winston.transports.Console(),
+		new winston.transports.File({
+			filename: path.join(path.dirname(fs.realpathSync(__filename)), config.log)
+		})
+	]
+})
 
 /* The current weather information from Shergood, or null if no weather info
  * has been retrieved yet.
@@ -161,25 +177,6 @@ function fetchMetar() {
 /* Fetch weather data at start and periodically. */
 fetchMetar()
 setInterval(fetchMetar, config.metar.update)
-
-/* Create a logger instance to log messages to console and a log file. */
-const logger = createLogger({
-	format: format.combine(
-		format.splat(),
-		format.simple()
-	),
-	transports: [
-		new transports.Console({
-			timestamp: true
-		}),
-		new transports.File(
-			{
-				timestamp: true,
-				filename: path.join(path.dirname(fs.realpathSync(__filename)), config.log)
-			}
-		)
-	]
-})
 
 /* Create the MQTT client and connect to the Corrade MQTT server. */
 const mqttClient = mqtt.connect(config.corrade.mqtt)
