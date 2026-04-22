@@ -17,9 +17,8 @@ gridtalkie:
   # Mapping of GridTalkie channels to the SL text channels that the viewer
   # will use to interact with them.
   channels:
-    12755: 11
-    12270-Gridwide ATC: 12
-    11920-BLAKE: 13
+    12270-Gridwide ATC: 11
+    11920-BLAKE: 12
 
 # ATC bot configuration
 atc:
