@@ -8,12 +8,10 @@
   },
   "keywords": [
     "corrade",
-    "discord",
     "bot",
     "secondlife"
   ],
-  "author": "Wizardry and Steamworks <office@grimore.org>",
-  "license": "CC-BY-2.0",
+  "author": "Annabelle Puddles <annabellepuddles@gmail.com>",
   "dependencies": {
     "fast-xml-parser": "^5.7.1",
     "mqtt": "^4.3.7",
