@@ -35,9 +35,9 @@ function basicATCPattern(keywords) {
  * More complex messages will need to be done as a custom regex.
  */
 const flightPlanPattern = basicATCPattern('flight ?plan')
-const radioCheckPattern = basicATCPattern('radio ?check')
+const radioCheckPattern = basicATCPattern('radio ?(check|test)')
 const windCheckPattern = basicATCPattern('wind ?check')
-const startPattern = basicATCPattern('start')
+const startPattern = basicATCPattern('start ?(up)?')
 const takeOffPattern = basicATCPattern('take ?off|depart(ure)?')
 const landingPattern = basicATCPattern('land(ing)?')
 const weatherCheckPattern = basicATCPattern('weather')
@@ -308,8 +308,17 @@ function respondToATCMessage(message) {
 			}
 			weather += ` AT ${metar.clouds.ceiling} FEET. `
 
-			weather += `TEMPERATURE ${metar.temperature}. `
-			weather += `DEWPOINT ${metar.dewpoint}. `
+			weather += 'TEMPERATURE '
+			if (metar.temperature < 0) {
+				weather += 'MINUS '
+			}
+			weather += `${Math.abs(metar.temperature)}. `
+
+			weather += 'DEWPOINT '
+			if (metar.dewpoint < 0) {
+				weather += 'MINUS '
+			}
+			weather += `${Math.abs(metar.dewpoint)}. `
 
 			weather += `ALTIMETER ${metar.altimeter}.`
 
