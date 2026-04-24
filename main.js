@@ -415,6 +415,6 @@ mqttClient.on('message', (topic, message) => {
 			return
 		}
 
-		say(channel, response)
+		say(channel, response.toUpperCase())
 	}
 })
