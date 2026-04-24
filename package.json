@@ -1,7 +1,7 @@
 {
-  "name": "atc",
+  "name": "atc-bot",
   "version": "1.0.0",
-  "description": "ATC",
+  "description": "ATC bot bridge for Corrade/GridTalkie",
   "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -9,7 +9,9 @@
   "keywords": [
     "corrade",
     "bot",
-    "secondlife"
+    "secondlife",
+    "atc",
+    "gridtalkie"
   ],
   "author": "Annabelle Puddles <annabellepuddles@gmail.com>",
   "dependencies": {
