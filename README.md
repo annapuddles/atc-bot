@@ -46,7 +46,7 @@ You must include the commas between each part.
 |---------|-----------------------|----------------------|
 | Radio check | "SLYN tower, N12345, radio check." | "N12345, SLYN TOWER, CLEAR RADIO SIGNAL RECEIVED 5 BY 5." |
 | Wind check | "SLYN tower, N12345, wind check." | "N12345, SLYN TOWER, WIND 330 AT 5 KNOTS." |
-| Weather check | "SLYN tower, N12345, weather check." | "N12345, SLYN TOWER, LATEST WEATHER INFORMATION: WIND 330 AT 5 KNOTS. VISIBILITY 10 MILES. CLOUDS FEW AT 9000 FEET. TEMPERATURE 19. DEWPOINT 0. ALTIMETER 30.02." |
+| Weather report | "SLYN tower, N12345, say weather report." | "N12345, SLYN TOWER, LATEST WEATHER INFORMATION: WIND 330 AT 5 KNOTS. VISIBILITY 10 MILES. CLOUDS FEW AT 9000 FEET. TEMPERATURE 19. DEWPOINT 0. ALTIMETER 30.02." |
 | Submitting a flight plan | "SLYN tower, N12345, flight plan SLYN > SLWS." | "N12345, SLYN TOWER, FLIGHT PLAN APPROVED." |
 | Aircraft start-up | "SLYN tower, N12345, requesting start." | "N12345, SLYN TOWER, START APPROVED. CONTACT TOWER FOR DEPARTURE." |
 | Take off | "SLYN  tower, N12345, requesting clearance for takeoff." | "N12345, SLYN TOWER, CLEARED FOR TAKE OFF." |
