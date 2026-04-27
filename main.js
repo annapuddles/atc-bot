@@ -231,6 +231,15 @@ function matchesPattern(str, pattern) {
 	return [...str.matchAll(pattern)]
 }
 
+/* Get a description of the wind from the current METAR. */
+function windDescription() {
+	if (metar.wind.speed < 1) {
+		return 'CALM';
+	}
+
+	return `${metar.wind.heading} AT ${metar.wind.speed} KNOTS`;
+}
+
 /* Create a response to ATC messages that fit certain patterns. */
 function respondToATCMessage(message) {
 	/* Flight plan */
@@ -252,7 +261,7 @@ function respondToATCMessage(message) {
 		const callsign = matches[0][1]
 
 		if (metar) {
-			return `${callsign}, ${config.atc.handle}, WIND ${metar.wind.heading} AT ${metar.wind.speed} KNOTS.`
+			return `${callsign}, ${config.atc.handle}, WIND ${windDescription()}.`
 		} else {
 			return `${callsign}, ${config.atc.handle}, UNABLE, WEATHER INFORMATION NOT AVAILABLE AT THIS TIME.`
 		}
@@ -263,7 +272,7 @@ function respondToATCMessage(message) {
 		const callsign = matches[0][1]
 
 		if (metar) {
-			let weather = `WIND ${metar.wind.heading} AT ${metar.wind.speed} KNOTS. `
+			let weather = `WIND ${windDescription()}. `
 
 			weather += `VISIBILITY ${metar.visibility} MILES. `
 
