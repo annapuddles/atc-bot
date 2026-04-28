@@ -66,72 +66,52 @@ const logger = winston.createLogger({
  */
 let metar = null
 
+/* Shergood METAR regex pattern */
+const metarPattern = /^(?<icao>[A-Z0-9]+) (?<day>\d{2})(?<hour>\d{2})(?<minute>\d{2})Z AUTO (?<hdg>\d{3})(?<spd>\d{2})KT (?<vis>\d+)SM ?(?<precip>-RA|RA|\+RA|-SN|SN|\+SN)? (?<type>CLR|FEW|SCT|BRK|OVC)(?<ceil>\d{3}) (?<temp>M?\d{2})\/(?<dew>M?\d{2}) A(?<alt>\d{4}) RMK AO2$/i
+
+/* Parse a METAR temperature value to an integer. */
+function parseMetarTemp(raw) {
+	if (raw.substring(0, 1) === 'M') {
+		return parseInt(raw.substring(1)) * -1
+	} else {
+		return parseInt(raw)
+	}
+}
+
+/* Parse METAR altimeter value to decimal string. */
+function parseMetarAlt(raw) {
+	return raw.substring(0, 2) + '.' + raw.substring(2, 4)
+}
+
 /* Parse METAR string into an object. */
 function parseMetar(raw) {
-	const parts = raw.split(' ')
-	let i = 0
+	const result = metarPattern.exec(raw)
 
-	const icao = parts[i++]
-
-	const time = parts[i++]
-	const day = time.substring(0, 2)
-	const hour = time.substring(2, 4)
-	const minute = time.substring(4, 6)
-
-	const method = parts[i++]
-
-	const wind = parts[i++]
-	const windHdg = wind.substring(0, 3)
-	const windSpd = parseInt(wind.substring(3, 5))
-
-	const vis = parseInt(parts[i++])
-
-	const precip = parts.length === 11 ? parts[i++] : ''
-
-	const clouds = parts[i++]
-	const cloudType = clouds.substring(0, clouds.length - 3)
-	const cloudCeil = parseInt(clouds.substring(clouds.length - 3)) * 100
-
-	const tempdew = parts[i++]
-	const tempdewParts = tempdew.split('/')
-	const temp = tempdewParts[0]
-	let temperature
-	if (temp.substring(0, 1) === 'M') {
-		temperature = parseInt(temp.substring(1)) * -1
-	} else {
-		temperature = parseInt(temp)
+	if (result === null) {
+		logger.error(`Invalid METAR: ${raw}`)
+		return null
 	}
-	const dew = tempdewParts[1]
-	let dewpoint
-	if (dew.substring(0, 1) === 'M') {
-		dewpoint = parseInt(dew.substring(1)) * -1
-	} else {
-		dewpoint = parseInt(dew)
-	}
-
-	const alt = parts[i++]
-	const altimeter = alt.substring(1, 3) + '.' + alt.substring(3, 5)
 
 	return {
-		icao: icao,
+		icao: result.groups.icao,
 		time: {
-			day: day,
-			hour: hour,
-			minute: minute
+			day: result.groups.day,
+			hour: result.groups.hour,
+			minute: result.groups.minute
 		},
 		wind: {
-			heading: windHdg,
-			speed: windSpd
+			heading: result.groups.hdg,
+			speed: parseInt(result.groups.spd)
 		},
-		visibility: vis,
-		precipitation: precip,
+		visibility: parseInt(result.groups.vis),
+		precipitation: result.groups.precip,
 		clouds: {
-			type: cloudType,
-			ceiling: cloudCeil
+			type: result.groups.type,
+			ceiling: parseInt(result.groups.ceil) * 100
 		},
-		temperature: temperature,
-		dewpoint: dewpoint,
-		altimeter: altimeter
+		temperature: parseMetarTemp(result.groups.temp),
+		dewpoint: parseMetarTemp(result.groups.dew),
+		altimeter: parseMetarAlt(result.groups.alt)
 	}
 }
 
