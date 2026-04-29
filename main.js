@@ -41,6 +41,7 @@ const startPattern = basicATCPattern('start ?(up)?')
 const takeOffPattern = basicATCPattern('take ?off|depart(ure)?')
 const landingPattern = basicATCPattern('land(ing)?')
 const weatherCheckPattern = basicATCPattern('weather')
+const takeOffHelipadPattern = new RegExp(`^${config.atc.prefix} ?.*, ?(.*),.*\\b(?:take? off|depart(?:ure)?)\\b.*\\bhelipad ([0-9a-z]+)\\b.*$`, 'gi')
 const landingHelipadPattern = new RegExp(`^${config.atc.prefix} ?.*, ?(.*),.*\\bland(?:ing)?\\b.*\\bhelipad ([0-9a-z]+)\\b.*$`, 'gi')
 const otherCallsignPattern = new RegExp(`^${config.atc.prefix} ?.*, ?(.*),.*$`, 'gi')
 const otherPattern = new RegExp(`^${config.atc.prefix}.*$`, 'gi')
@@ -322,6 +323,14 @@ function respondToATCMessage(message) {
 		const callsign = matches[0][1]
 
 		return `${callsign}, ${config.atc.handle}, START APPROVED. CONTACT TOWER FOR DEPARTURE.`
+	}
+
+	/* Takeoff (helipad) */
+	if ((matches = matchesPattern(message, takeOffHelipadPattern)).length > 0) {
+		const callsign = matches[0][1]
+		const helipad = matches[0][2]
+
+		return `${callsign}, ${config.atc.handle}, CLEARED FOR TAKE OFF FROM HELIPAD ${helipad}. ${config.atc.departureInfo}`
 	}
 
 	/* Takeoff */
