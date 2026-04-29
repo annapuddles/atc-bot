@@ -18,32 +18,33 @@ const config = yaml.load('config.yml')
  */
 const gtMessagePattern = /^{#([^}]+)} ([^:]+): (.*)$/g
 
-/* Create a regex using a standard ATC message format:
+/* Create a regexp using a standard ATC message format:
  *
  * <ICAO>, <callsign>, <request>
  *
  * */
-function basicATCPattern(keywords) {
-	return new RegExp(`^${config.atc.prefix} ?.*, ?(.*),.*(?:\\b${keywords}\\b).*$`, 'gi')
+function standardATCPattern(keywords) {
+	return new RegExp(`^${config.atc.prefix} ?.*, ?(?<callsign>.*),.*(?:\\b${keywords}\\b).*$`, 'gi')
 }
 
 /* ATC message patterns.
  *
- * Simple messages can use the basicATCPattern to match specific keywords in
+ * Simple messages can use the standardATCPattern to match specific keywords in
  * the request.
  *
  * More complex messages will need to be done as a custom regex.
  */
-const flightPlanPattern = basicATCPattern('flight ?plan')
-const radioCheckPattern = basicATCPattern('radio ?(check|test)')
-const windCheckPattern = basicATCPattern('wind ?check')
-const startPattern = basicATCPattern('start ?(up)?')
-const takeOffPattern = basicATCPattern('take ?off|depart(ure)?')
-const landingPattern = basicATCPattern('land(ing)?')
-const weatherCheckPattern = basicATCPattern('weather')
-const takeOffHelipadPattern = new RegExp(`^${config.atc.prefix} ?.*, ?(.*),.*\\b(?:take? off|depart(?:ure)?)\\b.*\\bhelipad ([0-9a-z]+)\\b.*$`, 'gi')
-const landingHelipadPattern = new RegExp(`^${config.atc.prefix} ?.*, ?(.*),.*\\bland(?:ing)?\\b.*\\bhelipad ([0-9a-z]+)\\b.*$`, 'gi')
-const otherCallsignPattern = new RegExp(`^${config.atc.prefix} ?.*, ?(.*),.*$`, 'gi')
+const flightPlanPattern = standardATCPattern('flight ?plan')
+const radioCheckPattern = standardATCPattern('radio ?(?:check|test)')
+const windCheckPattern = standardATCPattern('wind ?check')
+const startPattern = standardATCPattern('start ?(?:up)?')
+const takeOffPattern = standardATCPattern('take ?off|depart(?:ure)?')
+const landingPattern = standardATCPattern('land(?:ing)?')
+const weatherCheckPattern = standardATCPattern('weather')
+const takeOffHelipadPattern = new RegExp(`^${config.atc.prefix} ?.*, ?(?<callsign>.*),.*\\b(?:take? off|depart(?:ure)?)\\b.*\\bhelipad (?<helipad>[0-9a-z]+)\\b.*$`, 'gi')
+const landingHelipadPattern = new RegExp(`^${config.atc.prefix} ?.*, ?(?<callsign>.*),.*\\bland(?:ing)?\\b.*\\bhelipad (?<helipad>[0-9a-z]+)\\b.*$`, 'gi')
+const whoopPattern = standardATCPattern('wh?oop|meow|bark|ruff')
+const otherCallsignPattern = new RegExp(`^${config.atc.prefix} ?.*, ?(?<callsign>.*),.*$`, 'gi')
 const otherPattern = new RegExp(`^${config.atc.prefix}.*$`, 'gi')
 
 /* Create a logger instance to log messages to console and a log file. */
@@ -215,43 +216,37 @@ function matchesPattern(str, pattern) {
 /* Get a description of the wind from the current METAR. */
 function windDescription() {
 	if (metar.wind.speed < 1) {
-		return 'CALM';
+		return 'CALM'
 	}
 
-	return `${metar.wind.heading} AT ${metar.wind.speed} KNOTS`;
+	return `${metar.wind.heading} AT ${metar.wind.speed} KNOTS`
 }
 
 /* Create a response to ATC messages that fit certain patterns. */
 function respondToATCMessage(message) {
-	/* Flight plan */
-	if ((matches = matchesPattern(message, flightPlanPattern)).length > 0) {
-		const callsign = matches[0][1]
+	let result
 
-		return `${callsign}, ${config.atc.handle}, FLIGHT PLAN APPROVED.`
+	/* Flight plan */
+	if (result = flightPlanPattern.exec(message)) {
+		return `${result.groups.callsign}, ${config.atc.handle}, FLIGHT PLAN APPROVED.`
 	}
 
 	/* Radio check */
-	if ((matches = matchesPattern(message, radioCheckPattern)).length > 0) {
-		const callsign = matches[0][1]
-
-		return `${callsign}, ${config.atc.handle}, CLEAR RADIO SIGNAL RECEIVED 5 BY 5.`
+	if (result = radioCheckPattern.exec(message)) {
+		return `${result.groups.callsign}, ${config.atc.handle}, CLEAR RADIO SIGNAL RECEIVED 5 BY 5.`
 	}
 
 	/* Wind check */
-	if ((matches = matchesPattern(message, windCheckPattern)).length > 0) {
-		const callsign = matches[0][1]
-
+	if (result = windCheckPattern.exec(message)) {
 		if (metar) {
-			return `${callsign}, ${config.atc.handle}, WIND ${windDescription()}.`
+			return `${result.groups.callsign}, ${config.atc.handle}, WIND ${windDescription()}.`
 		} else {
-			return `${callsign}, ${config.atc.handle}, UNABLE, WEATHER INFORMATION NOT AVAILABLE AT THIS TIME.`
+			return `${result.groups.callsign}, ${config.atc.handle}, UNABLE, WEATHER INFORMATION NOT AVAILABLE AT THIS TIME.`
 		}
 	}
 
 	/* Weather */
-	if ((matches = matchesPattern(message, weatherCheckPattern)).length > 0) {
-		const callsign = matches[0][1]
-
+	if (result = weatherCheckPattern.exec(message)) {
 		if (metar) {
 			let weather = `WIND ${windDescription()}. `
 
@@ -312,58 +307,44 @@ function respondToATCMessage(message) {
 
 			weather += `ALTIMETER ${metar.altimeter}.`
 
-			return `${callsign}, ${config.atc.handle}, LATEST WEATHER INFORMATION: ${weather}`
+			return `${result.groups.callsign}, ${config.atc.handle}, LATEST WEATHER INFORMATION: ${weather}`
 		} else {
-			return `${callsign}, ${config.atc.handle}, UNABLE. WEATHER INFORMATION NOT AVAILABLE AT THIS TIME.`
+			return `${result.groups.callsign}, ${config.atc.handle}, UNABLE, WEATHER INFORMATION NOT AVAILABLE AT THIS TIME.`
 		}
 	}
 
 	/* Start */
-	if ((matches = matchesPattern(message, startPattern)).length > 0) {
-		const callsign = matches[0][1]
-
-		return `${callsign}, ${config.atc.handle}, START APPROVED. CONTACT TOWER FOR DEPARTURE.`
+	if (result = startPattern.exec(message)) {
+		return `${result.groups.callsign}, ${config.atc.handle}, START APPROVED. CONTACT TOWER FOR DEPARTURE.`
 	}
 
 	/* Takeoff (helipad) */
-	if ((matches = matchesPattern(message, takeOffHelipadPattern)).length > 0) {
-		const callsign = matches[0][1]
-		const helipad = matches[0][2]
-
-		return `${callsign}, ${config.atc.handle}, CLEARED FOR TAKE OFF FROM HELIPAD ${helipad}. ${config.atc.departureInfo}`
+	if (result = takeOffHelipadPattern.exec(message)) {
+		return `${result.groups.callsign}, ${config.atc.handle}, CLEARED FOR TAKE OFF FROM HELIPAD ${result.groups.helipad}. ${config.atc.departureInfo}`
 	}
 
 	/* Takeoff */
-	if ((matches = matchesPattern(message, takeOffPattern)).length > 0) {
-		const callsign = matches[0][1]
-
-		return `${callsign}, ${config.atc.handle}, CLEARED FOR TAKE OFF. ${config.atc.departureInfo}`
+	if (result = takeOffPattern.exec(message)) {
+		return `${result.groups.callsign}, ${config.atc.handle}, CLEARED FOR TAKE OFF. ${config.atc.departureInfo}`
 	}
 
 	/* Landing (helipad) */
-	if ((matches = matchesPattern(message, landingHelipadPattern)).length > 0) {
-		const callsign = matches[0][1]
-		const helipad = matches[0][2]
-
-		return `${callsign}, ${config.atc.handle}, LANDING APPROVED ON HELIPAD ${helipad}. ${config.atc.approachInfo}`
+	if (result = landingHelipadPattern.exec(message)) {
+		return `${result.groups.callsign}, ${config.atc.handle}, LANDING APPROVED ON HELIPAD ${result.groups.helipad}. ${config.atc.approachInfo}`
 	}
 
 	/* Landing */
-	if ((matches = matchesPattern(message, landingPattern)).length > 0) {
-		const callsign = matches[0][1]
-
-		return `${callsign}, ${config.atc.handle}, LANDING APPROVED. ${config.atc.approachInfo}`
+	if (result = landingPattern.exec(message)) {
+		return `${result.groups.callsign}, ${config.atc.handle}, LANDING APPROVED. ${config.atc.approachInfo}`
 	}
 
 	/* Other messages with a valid callsign */
-	if ((matches = matchesPattern(message, otherCallsignPattern)).length > 0) {
-		const callsign = matches[0][1]
-
-		return `${callsign}, ${config.atc.handle}, SAY AGAIN?`
+	if (result = otherCallsignPattern.exec(message)) {
+		return `${result.groups.callsign}, ${config.atc.handle}, SAY AGAIN?`
 	}
 
 	/* Other messages with no callsign */
-	if ((matches = matchesPattern(message, otherPattern)).length > 0) {
+	if (result = otherPattern.exec(message)) {
 		return `AIRCRAFT CALLING ${config.atc.handle}, SAY AGAIN WITH CALLSIGN.`
 	}
 
