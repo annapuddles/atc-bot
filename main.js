@@ -43,7 +43,6 @@ const landingPattern = standardATCPattern('land(?:ing)?')
 const weatherCheckPattern = standardATCPattern('weather')
 const takeOffHelipadPattern = new RegExp(`^${config.atc.prefix} ?.*, ?(?<callsign>.*),.*\\b(?:take? off|depart(?:ure)?)\\b.*\\bhelipad (?<helipad>[0-9a-z]+)\\b.*$`, 'gi')
 const landingHelipadPattern = new RegExp(`^${config.atc.prefix} ?.*, ?(?<callsign>.*),.*\\bland(?:ing)?\\b.*\\bhelipad (?<helipad>[0-9a-z]+)\\b.*$`, 'gi')
-const whoopPattern = standardATCPattern('wh?oop|meow|bark|ruff')
 const otherCallsignPattern = new RegExp(`^${config.atc.prefix} ?.*, ?(?<callsign>.*),.*$`, 'gi')
 const otherPattern = new RegExp(`^${config.atc.prefix}.*$`, 'gi')
 
