@@ -49,15 +49,37 @@ const otherPattern = new RegExp(`^${config.atc.prefix}.*$`, 'gi')
 /* Create a logger instance to log messages to console and a log file. */
 const logger = winston.createLogger({
 	format: winston.format.combine(
-		winston.format.timestamp({
-			format: 'YYYY-MM-DD HH:mm:ss'
-		}),
-		winston.format.printf(info => `${info.timestamp} ${info.level}: ${info.message}`)
-	),
+			winston.format.timestamp({
+				format: 'YYYY-MM-DD HH:mm:ss'
+			}),
+			winston.format.printf(info => `${info.timestamp} ${info.level}: ${info.message}`)
+		),
 	transports: [
 		new winston.transports.Console(),
 		new winston.transports.File({
-			filename: path.join(path.dirname(fs.realpathSync(__filename)), config.log)
+			filename: path.join(path.dirname(fs.realpathSync(__filename)), config.logs.main)
+		})
+	]
+})
+
+/* Timestamp format in Second Life Time (SLT). */
+const timestampInSLT = () => {
+	return new Date().toLocaleString('sv', {
+		timeZone: 'America/Los_Angeles'
+	})
+}
+
+/* Create logger to log only the transcript of GridTalkie messages. */
+const transcript = winston.createLogger({
+	format: winston.format.combine(
+			winston.format.timestamp({
+				format: timestampInSLT
+			}),
+			winston.format.printf(info => `${info.timestamp} ${info.message}`)
+		),
+	transports: [
+		new winston.transports.File({
+			filename: path.join(path.dirname(fs.realpathSync(__filename)), config.logs.transcript)
 		})
 	]
 })
@@ -377,22 +399,34 @@ mqttClient.on('message', (topic, message) => {
 	const gtHandle = matches[0][2]
 	const gtMessage = matches[0][3]
 
+	/* Log the incoming message in the transcript. */
+	transcript.info(`{#${gtChannel}} ${gtHandle}: ${gtMessage}`)
+
 	/* Ignore messages on GridTalkie channels we don't care about. */
 	if (config.gridtalkie.channels[gtChannel] === undefined) {
 		return
 	}
 
 	/* Create a response by matching the message to standard ATC patterns. */
-	const response = respondToATCMessage(gtMessage)
+	let response = respondToATCMessage(gtMessage)
 
 	/* If a response was created, send it via GridTalkie on the appropriate channel. */
 	if (response) {
+		/* Get the SL text chat channel from the config mapping. */
 		const channel = config.gridtalkie.channels[gtChannel]
 
+		/* If no channel mapping is defined in the config, abort. */
 		if (channel === undefined) {
 			return
 		}
 
-		say(channel, response.toUpperCase())
+		/* Convert response to all caps. */
+		response = response.toUpperCase()
+
+		/* Send the response over GridTalkie. */
+		say(channel, response)
+
+		/* Log the response in the transcript. */
+		transcript.info(`{#${gtChannel}} ${config.atc.handle}: ${response}`)
 	}
 })

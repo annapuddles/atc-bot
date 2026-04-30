@@ -1,5 +1,10 @@
-# Path to use for the log file
-log: atc.log
+# Paths to use for the log files
+logs:
+  # The main log for all messages
+  main: atc.log
+
+  # Log for only radio messages
+  transcript: transcript.log
 
 # Corrade configuration
 corrade:
