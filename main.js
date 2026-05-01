@@ -426,9 +426,6 @@ mqttClient.on('message', (topic, message) => {
 			return
 		}
 
-		/* Convert response to all caps. */
-		response = response.toUpperCase()
-
 		/* Send the response over GridTalkie. */
 		say(channel, response)
 
