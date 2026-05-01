@@ -36,8 +36,11 @@ atc:
   # Extra information given with departure clearances
   departureInfo: ""
 
-  # Extra information given with approach clearances
+  # Information given for approach messages
   approachInfo: ""
+
+  # Extra information given with landing clearances
+  landingInfo: ""
 
 # Shergood METAR config
 metar:

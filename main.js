@@ -43,6 +43,7 @@ const landingPattern = standardATCPattern('land(?:ing)?')
 const weatherCheckPattern = standardATCPattern('weather')
 const takeOffHelipadPattern = new RegExp(`^${config.atc.prefix} ?.*, ?(?<callsign>.*),.*\\b(?:take? off|depart(?:ure)?)\\b.*\\bhelipad (?<helipad>[0-9a-z]+)\\b.*$`, 'gi')
 const landingHelipadPattern = new RegExp(`^${config.atc.prefix} ?.*, ?(?<callsign>.*),.*\\bland(?:ing)?\\b.*\\bhelipad (?<helipad>[0-9a-z]+)\\b.*$`, 'gi')
+const approachPattern = standardATCPattern('approach|eta')
 const otherCallsignPattern = new RegExp(`^${config.atc.prefix} ?.*, ?(?<callsign>.*),.*$`, 'gi')
 const otherPattern = new RegExp(`^${config.atc.prefix}.*$`, 'gi')
 
@@ -351,12 +352,17 @@ function respondToATCMessage(message) {
 
 	/* Landing (helipad) */
 	if (result = landingHelipadPattern.exec(message)) {
-		return `${result.groups.callsign}, ${config.atc.handle}, LANDING APPROVED ON HELIPAD ${result.groups.helipad}. ${config.atc.approachInfo}`
+		return `${result.groups.callsign}, ${config.atc.handle}, LANDING APPROVED ON HELIPAD ${result.groups.helipad}. ${config.atc.landingInfo}`
 	}
 
 	/* Landing */
 	if (result = landingPattern.exec(message)) {
-		return `${result.groups.callsign}, ${config.atc.handle}, LANDING APPROVED. ${config.atc.approachInfo}`
+		return `${result.groups.callsign}, ${config.atc.handle}, LANDING APPROVED. ${config.atc.landingInfo}`
+	}
+
+	/* Approach */
+	if (result = approachPattern.exec(message)) {
+		return `${result.groups.callsign}, ${config.atc.handle}, CONTINUE APPROACH. ${config.atc.approachInfo}`
 	}
 
 	/* Other messages with a valid callsign */
