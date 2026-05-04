@@ -16,7 +16,7 @@ const config = yaml.load('config.yml')
  * {#<channel>} <handle>: <message>
  *
  */
-const gtMessagePattern = /^{#([^}]+)} ([^:]+): (.*)$/g
+const gtMessagePattern = /^{#(?<channel>[^}]+)} (?<handle>[^:]+): (?<message>.*)$/g
 
 /* Create a regexp using a standard ATC message format:
  *
@@ -230,11 +230,6 @@ mqttClient.on('error', (error) => {
 	logger.error(`Error found while connecting to Corrade MQTT server: ${error}`)
 })
 
-/* Return array of all matches of a regex pattern on a string. */
-function matchesPattern(str, pattern) {
-	return [...str.matchAll(pattern)]
-}
-
 /* Get a description of the wind from the current METAR. */
 function windDescription() {
 	if (metar.wind.speed < 1) {
@@ -393,17 +388,17 @@ mqttClient.on('message', (topic, message) => {
 	logger.info(mqttMessage.message)
 
 	/* Check if the message matches the GridTalkie pattern. */
-	const matches = [...mqttMessage.message.matchAll(gtMessagePattern)]
+	const result = gtMessagePattern.exec(mqttMessage.message)
 
 	/* Ignore non-GridTalkie messages. */
-	if (matches.length === 0) {
+	if (result === null) {
 		return
 	}
 
 	/* Extract the GridTalkie channel, handle and message from the ownersay message. */
-	const gtChannel = matches[0][1]
-	const gtHandle = matches[0][2]
-	const gtMessage = matches[0][3]
+	const gtChannel = result.groups.channel
+	const gtHandle = result.groups.handle
+	const gtMessage = result.groups.message
 
 	/* Log the incoming message in the transcript. */
 	transcript.info(`{#${gtChannel}} ${gtHandle}: ${gtMessage}`)
