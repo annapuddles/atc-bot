@@ -256,7 +256,7 @@ function windDescription() {
 }
 
 /* Create a response to ATC messages that fit certain patterns. */
-function respondToATCMessage(message) {
+function respondToATCMessage(channel, handle, message) {
 	let result
 
 	/* Flight plan */
@@ -442,7 +442,7 @@ mqttClient.on('message', (topic, message) => {
 	}
 
 	/* Create a response by matching the message to standard ATC patterns. */
-	let response = respondToATCMessage(gtMessage)
+	let response = respondToATCMessage(gtChannel, gtHandle, gtMessage)
 
 	/* If a response was created, send it via GridTalkie on the appropriate channel. */
 	if (response) {
