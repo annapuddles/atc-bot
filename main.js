@@ -255,26 +255,31 @@ function windDescription() {
 	return `${metar.wind.heading} AT ${metar.wind.speed} KNOTS`
 }
 
+/* Format a standard ATC response to the specified callsign. */
+function standardResponse(callsign, message) {
+	return `${callsign}, ${config.atc.handle}, ${message}`
+}
+
 /* Create a response to ATC messages that fit certain patterns. */
 function respondToATCMessage(channel, handle, message) {
 	let result
 
 	/* Flight plan */
 	if (result = flightPlanPattern.exec(message)) {
-		return `${result.groups.callsign}, ${config.atc.handle}, FLIGHT PLAN APPROVED.`
+		return standardResponse(result.groups.callsign, 'FLIGHT PLAN APPROVED.')
 	}
 
 	/* Radio check */
 	if (result = radioCheckPattern.exec(message)) {
-		return `${result.groups.callsign}, ${config.atc.handle}, CLEAR RADIO SIGNAL RECEIVED 5 BY 5.`
+		return standardResponse(result.groups.callsign, 'CLEAR RADIO SIGNAL RECEIVED 5 BY 5.')
 	}
 
 	/* Wind check */
 	if (result = windCheckPattern.exec(message)) {
 		if (metar) {
-			return `${result.groups.callsign}, ${config.atc.handle}, WIND ${windDescription()}.`
+			return standardResponse(result.groups.callsign, `WIND ${windDescription()}.`)
 		} else {
-			return `${result.groups.callsign}, ${config.atc.handle}, ${noMetarMessage}.`
+			return standardResponse(result.groups.callsign, noMetarMessage)
 		}
 	}
 
@@ -330,72 +335,72 @@ function respondToATCMessage(channel, handle, message) {
 			weather += `DEWPOINT ${formatMetarTemp(metar.dewpoint)}. `
 			weather += `ALTIMETER ${metar.altimeter}.`
 
-			return `${result.groups.callsign}, ${config.atc.handle}, LATEST WEATHER INFORMATION: ${weather}`
+			return standardResponse(result.groups.callsign, `LATEST WEATHER INFORMATION: ${weather}`)
 		} else {
-			return `${result.groups.callsign}, ${config.atc.handle}, ${noMetarMessage}.`
+			return standardResponse(result.groups.callsign, noMetarMessage)
 		}
 	}
 
 	/* Altimeter */
 	if (result = altimeterPattern.exec(message)) {
 		if (metar) {
-			return `${result.groups.callsign}, ${config.atc.handle}, ALTIMETER ${metar.altimeter}.`
+			return standardResponse(result.groups.callsign, `ALTIMETER ${metar.altimeter}.`)
 		} else {
-			return `${result.groups.callsign}, ${config.atc.handle}, ${noMetarMessage}.`
+			return standardResponse(result.groups.callsign, noMetarMessage)
 		}
 	}
 
 	/* Visibility */
 	if (result = visibilityPattern.exec(message)) {
 		if (metar) {
-			return `${result.groups.callsign}, ${config.atc.handle}, VISIBILITY ${metar.visibility} MILES.`
+			return standardResponse(result.groups.callsign, `VISIBILITY ${metar.visibility} MILES.`)
 		} else {
-			return `${result.groups.callsign}, ${config.atc.handle}, ${noMetarMessage}.`
+			return standardResponse(result.groups.callsign, noMetarMessage)
 		}
 	}
 
 	/* Temperature */
 	if (result = temperatureDewpointPattern.exec(message)) {
 		if (metar) {
-			return `${result.groups.callsign}, ${config.atc.handle}, TEMPERATURE ${formatMetarTemp(metar.temperature)}. DEWPOINT ${formatMetarTemp(metar.dewpoint)}.`
+			return standardResponse(result.groups.callsign, `TEMPERATURE ${formatMetarTemp(metar.temperature)}. DEWPOINT ${formatMetarTemp(metar.dewpoint)}.`)
 		} else {
-			return `${result.groups.callsign}, ${config.atc.handle}, ${noMetarMessage}.`
+			return standardResponse(result.groups.callsign, noMetarMessage)
 		}
 	}
 
 	/* Start */
 	if (result = startPattern.exec(message)) {
-		return `${result.groups.callsign}, ${config.atc.handle}, START APPROVED. CONTACT TOWER FOR DEPARTURE.`
+		return standardResponse(result.groups.callsign, 'START APPROVED. CONTACT TOWER FOR DEPARTURE.')
 	}
 
 	/* Takeoff (helipad) */
 	if (result = takeOffHelipadPattern.exec(message)) {
-		return `${result.groups.callsign}, ${config.atc.handle}, CLEARED FOR TAKE OFF FROM HELIPAD ${result.groups.helipad}. ${config.atc.departureInfo}`
+		return standardResponse(result.groups.callsign, `CLEARED FOR TAKE OFF FROM HELIPAD ${result.groups.helipad}. ${config.atc.departureInfo}`)
 	}
 
 	/* Takeoff */
 	if (result = takeOffPattern.exec(message)) {
-		return `${result.groups.callsign}, ${config.atc.handle}, CLEARED FOR TAKE OFF. ${config.atc.departureInfo}`
+		return standardResponse(result.groups.callsign, `CLEARED FOR TAKE OFF. ${config.atc.departureInfo}`)
 	}
 
 	/* Landing (helipad) */
 	if (result = landingHelipadPattern.exec(message)) {
-		return `${result.groups.callsign}, ${config.atc.handle}, LANDING APPROVED ON HELIPAD ${result.groups.helipad}. ${config.atc.landingInfo}`
+		return standardResponse(result.groups.callsign, `LANDING APPROVED ON HELIPAD ${result.groups.helipad}. ${config.atc.landingInfo}`)
 	}
 
 	/* Landing */
 	if (result = landingPattern.exec(message)) {
-		return `${result.groups.callsign}, ${config.atc.handle}, LANDING APPROVED. ${config.atc.landingInfo}`
+		return standardResponse(result.groups.callsign, `LANDING APPROVED. ${config.atc.landingInfo}`)
 	}
 
 	/* Approach */
 	if (result = approachPattern.exec(message)) {
-		return `${result.groups.callsign}, ${config.atc.handle}, CONTINUE APPROACH. ${config.atc.approachInfo}`
+		return standardResponse(result.groups.callsign, `CONTINUE APPROACH. ${config.atc.approachInfo}`)
 	}
 
 	/* Other messages with a valid callsign */
 	if (result = otherCallsignPattern.exec(message)) {
-		return `${result.groups.callsign}, ${config.atc.handle}, SAY AGAIN?`
+		return standardResponse(result.groups.callsign, 'SAY AGAIN?')
 	}
 
 	/* Other messages with no callsign */
