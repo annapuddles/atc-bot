@@ -41,6 +41,9 @@ const startPattern = standardATCPattern('start ?(?:up)?')
 const takeOffPattern = standardATCPattern('take ?off|depart(?:ure)?')
 const landingPattern = standardATCPattern('land(?:ing)?')
 const weatherCheckPattern = standardATCPattern('weather')
+const altimeterPattern = standardATCPattern('altimeter')
+const temperatureDewpointPattern = standardATCPattern('temperature|dew ?point')
+const visibilityPattern = standardATCPattern('visibility')
 const takeOffHelipadPattern = new RegExp(`^${config.atc.prefix} ?.*, ?(?<callsign>.*),.*\\b(?:take? off|depart(?:ure)?)\\b.*\\bhelipad (?<helipad>[0-9a-z]+)\\b.*$`, 'gi')
 const landingHelipadPattern = new RegExp(`^${config.atc.prefix} ?.*, ?(?<callsign>.*),.*\\bland(?:ing)?\\b.*\\bhelipad (?<helipad>[0-9a-z]+)\\b.*$`, 'gi')
 const approachPattern = standardATCPattern('approach|eta')
@@ -182,6 +185,19 @@ function fetchMetar() {
 fetchMetar()
 setInterval(fetchMetar, config.metar.update)
 
+/* Message sent when no METAR data is available yet. */
+const noMetarMessage = 'UNABLE, WEATHER INFORMATION IS NOT AVAILABLE AT THIS TIME'
+
+/* Create the printed version of a METAR temperature value. */
+function formatMetarTemp(temp) {
+	let text = ''
+	if (temp < 0) {
+		text += 'MINUS '
+	}
+	text += Math.abs(temp)
+	return text
+}
+
 /* Create the MQTT client and connect to the Corrade MQTT server. */
 const mqttClient = mqtt.connect(config.corrade.mqtt)
 
@@ -258,7 +274,7 @@ function respondToATCMessage(message) {
 		if (metar) {
 			return `${result.groups.callsign}, ${config.atc.handle}, WIND ${windDescription()}.`
 		} else {
-			return `${result.groups.callsign}, ${config.atc.handle}, UNABLE, WEATHER INFORMATION NOT AVAILABLE AT THIS TIME.`
+			return `${result.groups.callsign}, ${config.atc.handle}, ${noMetarMessage}.`
 		}
 	}
 
@@ -310,23 +326,40 @@ function respondToATCMessage(message) {
 			}
 			weather += ` AT ${metar.clouds.ceiling} FEET. `
 
-			weather += 'TEMPERATURE '
-			if (metar.temperature < 0) {
-				weather += 'MINUS '
-			}
-			weather += `${Math.abs(metar.temperature)}. `
-
-			weather += 'DEWPOINT '
-			if (metar.dewpoint < 0) {
-				weather += 'MINUS '
-			}
-			weather += `${Math.abs(metar.dewpoint)}. `
-
+			weather += `TEMPERATURE ${formatMetarTemp(metar.temperature)}. `
+			weather += `DEWPOINT ${formatMetarTemp(metar.dewpoint)}. `
 			weather += `ALTIMETER ${metar.altimeter}.`
 
 			return `${result.groups.callsign}, ${config.atc.handle}, LATEST WEATHER INFORMATION: ${weather}`
 		} else {
-			return `${result.groups.callsign}, ${config.atc.handle}, UNABLE, WEATHER INFORMATION NOT AVAILABLE AT THIS TIME.`
+			return `${result.groups.callsign}, ${config.atc.handle}, ${noMetarMessage}.`
+		}
+	}
+
+	/* Altimeter */
+	if (result = altimeterPattern.exec(message)) {
+		if (metar) {
+			return `${result.groups.callsign}, ${config.atc.handle}, ALTIMETER ${metar.altimeter}.`
+		} else {
+			return `${result.groups.callsign}, ${config.atc.handle}, ${noMetarMessage}.`
+		}
+	}
+
+	/* Visibility */
+	if (result = visibilityPattern.exec(message)) {
+		if (metar) {
+			return `${result.groups.callsign}, ${config.atc.handle}, VISIBILITY ${metar.visibility} MILES.`
+		} else {
+			return `${result.groups.callsign}, ${config.atc.handle}, ${noMetarMessage}.`
+		}
+	}
+
+	/* Temperature */
+	if (result = temperatureDewpointPattern.exec(message)) {
+		if (metar) {
+			return `${result.groups.callsign}, ${config.atc.handle}, TEMPERATURE ${formatMetarTemp(metar.temperature)}. DEWPOINT ${formatMetarTemp(metar.dewpoint)}.`
+		} else {
+			return `${result.groups.callsign}, ${config.atc.handle}, ${noMetarMessage}.`
 		}
 	}
 
