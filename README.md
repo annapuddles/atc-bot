@@ -45,13 +45,18 @@ You must include the commas between each part.
 | Request | Pilot request example | Bot response example |
 |---------|-----------------------|----------------------|
 | Radio check | "SLYN tower, N12345, radio check." | "N12345, SLYN TOWER, CLEAR RADIO SIGNAL RECEIVED 5 BY 5." |
-| Wind check | "SLYN tower, N12345, wind check." | "N12345, SLYN TOWER, WIND 330 AT 5 KNOTS." |
 | Weather report | "SLYN tower, N12345, say weather report." | "N12345, SLYN TOWER, LATEST WEATHER INFORMATION: WIND 330 AT 5 KNOTS. VISIBILITY 10 MILES. CLOUDS FEW AT 9000 FEET. TEMPERATURE 19. DEWPOINT 0. ALTIMETER 30.02." |
+| Wind check | "SLYN tower, N12345, wind check." | "N12345, SLYN TOWER, WIND 330 AT 5 KNOTS." |
+| Visibility | "SLYN tower, N12345, say visibility." | "N12345, SLYN TOWER, VISIBILITY 10 MILES." |
+| Temperature | "SLYN tower, N12345, say temperature." | "N12345, SLYN TOWER, TEMPERATURE 19. DEWPOINT 0." |
+| Altimeter | "SLYN tower, N12345, say altimeter." | "N12345, SLYN TOWER, ALTIMETER 30.02." |
 | Submitting a flight plan | "SLYN tower, N12345, flight plan SLYN > SLWS." | "N12345, SLYN TOWER, FLIGHT PLAN APPROVED." |
-| Aircraft start-up | "SLYN tower, N12345, requesting start." | "N12345, SLYN TOWER, START APPROVED. CONTACT TOWER FOR DEPARTURE." |
-| Take off | "SLYN  tower, N12345, requesting clearance for takeoff." | "N12345, SLYN TOWER, CLEARED FOR TAKE OFF." |
-| Landing | "SLYN tower, N12345, requesting clearance to land." | "N12345, SLYN TOWER, LANDING APPROVED." |
-| Landing on helipad | "SLYN tower, N12345, requesting clearance to land on helipad H1." | "N12345, SLYN TOWER, LANDING APPROVED ON HELIPAD H1." |
+| Aircraft start-up | "SLYN tower, N12345, request start." | "N12345, SLYN TOWER, START APPROVED. CONTACT TOWER FOR DEPARTURE." |
+| Take off | "SLYN  tower, N12345, request clearance for takeoff." | "N12345, SLYN TOWER, CLEARED FOR TAKE OFF." |
+| Take off from helipad | "SLYN tower, N12345, request clearance for take off from helipad H1." | "N12345, SLYN TOWER, CLEARED FOR TAKE OFF FROM HELIPAD H1." |
+| Approach | "SLYN tower, N12345, eta 5 mins." | "N12345, SLYN TOWER, CONTINUE APPROACH." |
+| Landing | "SLYN tower, N12345, request clearance to land." | "N12345, SLYN TOWER, LANDING APPROVED." |
+| Landing on helipad | "SLYN tower, N12345, request clearance to land on helipad H1." | "N12345, SLYN TOWER, LANDING APPROVED ON HELIPAD H1." |
 
 # Example
 
