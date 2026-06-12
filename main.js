@@ -377,7 +377,7 @@ function respondToATCMessage(channel, handle, message) {
 
 	/* Takeoff (helipad) */
 	if (result = takeOffHelipadPattern.exec(message)) {
-		return standardResponse(result.groups.callsign, `CLEARED FOR TAKE OFF FROM HELIPAD ${result.groups.helipad}. ${config.atc.departureInfo}`)
+		return standardResponse(result.groups.callsign, `CLEARED FOR TAKE OFF FROM HELIPAD ${result.groups.helipad}. ${config.atc.departureInfoHelipad}`)
 	}
 
 	/* Takeoff (runway) */
@@ -392,7 +392,7 @@ function respondToATCMessage(channel, handle, message) {
 
 	/* Landing (helipad) */
 	if (result = landingHelipadPattern.exec(message)) {
-		return standardResponse(result.groups.callsign, `LANDING APPROVED ON HELIPAD ${result.groups.helipad}. ${config.atc.landingInfo}`)
+		return standardResponse(result.groups.callsign, `LANDING APPROVED ON HELIPAD ${result.groups.helipad}. ${config.atc.landingInfoHelipad}`)
 	}
 
 	/* Landing (runway) */
