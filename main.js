@@ -382,7 +382,7 @@ function respondToATCMessage(channel, handle, message) {
 
 	/* Takeoff (runway) */
 	if (result = takeOffRunwayPattern.exec(message)) {
-		return standardResponse(result.groups.callsign, `CLEARED FOR TAKE OFF VIA RUNWAY ${result.groups.runway}.`)
+		return standardResponse(result.groups.callsign, `CLEARED FOR TAKE OFF VIA RUNWAY ${result.groups.runway}. ${config.atc.departureInfoRunway}`)
 	}
 
 	/* Takeoff */
@@ -397,7 +397,7 @@ function respondToATCMessage(channel, handle, message) {
 
 	/* Landing (runway) */
 	if (result = landingRunwayPattern.exec(message)) {
-		return standardResponse(result.groups.callsign, `LANDING APPROVED VIA RUNWAY ${result.groups.runway}.`)
+		return standardResponse(result.groups.callsign, `LANDING APPROVED VIA RUNWAY ${result.groups.runway}. ${config.atc.landingInfoRunway}`)
 	}
 
 	/* Landing */

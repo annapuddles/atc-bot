@@ -33,14 +33,20 @@ atc:
   # The prefix that messages must start with for the bot to reply
   prefix: ICAO
 
-  # Extra information given with departure clearances
+  # Extra information given with generic departure clearances
   departureInfo: ""
 
-  # Information given for approach messages
+  # Extra information given with runway departure clearances
+  departureInfoRunway: ""
+
+  # Extra information given for approach messages
   approachInfo: ""
 
-  # Extra information given with landing clearances
+  # Extra information given with generic landing clearances
   landingInfo: ""
+
+  # Extra information given with runway landing clearances
+  landingInfoRunway: ""
 
 # Shergood METAR config
 metar:
