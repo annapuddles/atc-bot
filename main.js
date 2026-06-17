@@ -93,6 +93,12 @@ const transcript = winston.createLogger({
 	]
 })
 
+/* Execute a RegExp pattern disregarding any state. */
+function execPattern(pattern, text) {
+	pattern.lastIndex = 0
+	return pattern.exec(text)
+}
+
 /* The current weather information from Shergood, or null if no weather info
  * has been retrieved yet.
  */
@@ -117,7 +123,7 @@ function parseMetarAlt(raw) {
 
 /* Parse METAR string into an object. */
 function parseMetar(raw) {
-	const result = metarPattern.exec(raw)
+	const result = execPattern(metarPattern, raw)
 
 	if (result === null) {
 		logger.error(`Invalid METAR: ${raw}`)
@@ -270,17 +276,17 @@ function respondToATCMessage(channel, handle, message) {
 	let result
 
 	/* Flight plan */
-	if (result = flightPlanPattern.exec(message)) {
+	if (result = execPattern(flightPlanPattern, message)) {
 		return standardResponse(result.groups.callsign, 'FLIGHT PLAN APPROVED.')
 	}
 
 	/* Radio check */
-	if (result = radioCheckPattern.exec(message)) {
+	if (result = execPattern(radioCheckPattern, message)) {
 		return standardResponse(result.groups.callsign, 'CLEAR RADIO SIGNAL RECEIVED 5 BY 5.')
 	}
 
 	/* Wind check */
-	if (result = windCheckPattern.exec(message)) {
+	if (result = execPattern(windCheckPattern, message)) {
 		if (metar) {
 			return standardResponse(result.groups.callsign, `WIND ${windDescription()}.`)
 		} else {
@@ -289,7 +295,7 @@ function respondToATCMessage(channel, handle, message) {
 	}
 
 	/* Weather */
-	if (result = weatherCheckPattern.exec(message)) {
+	if (result = execPattern(weatherCheckPattern, message)) {
 		if (metar) {
 			let weather = `WIND ${windDescription()}. `
 
@@ -347,7 +353,7 @@ function respondToATCMessage(channel, handle, message) {
 	}
 
 	/* Altimeter */
-	if (result = altimeterPattern.exec(message)) {
+	if (result = execPattern(altimeterPattern, message)) {
 		if (metar) {
 			return standardResponse(result.groups.callsign, `ALTIMETER ${metar.altimeter}.`)
 		} else {
@@ -356,7 +362,7 @@ function respondToATCMessage(channel, handle, message) {
 	}
 
 	/* Visibility */
-	if (result = visibilityPattern.exec(message)) {
+	if (result = execPattern(visibilityPattern, message)) {
 		if (metar) {
 			return standardResponse(result.groups.callsign, `VISIBILITY ${metar.visibility} MILES.`)
 		} else {
@@ -365,7 +371,7 @@ function respondToATCMessage(channel, handle, message) {
 	}
 
 	/* Temperature */
-	if (result = temperatureDewpointPattern.exec(message)) {
+	if (result = execPattern(temperatureDewpointPattern, message)) {
 		if (metar) {
 			return standardResponse(result.groups.callsign, `TEMPERATURE ${formatMetarTemp(metar.temperature)}. DEWPOINT ${formatMetarTemp(metar.dewpoint)}.`)
 		} else {
@@ -374,67 +380,67 @@ function respondToATCMessage(channel, handle, message) {
 	}
 
 	/* Start */
-	if (result = startPattern.exec(message)) {
+	if (result = execPattern(startPattern, message)) {
 		return standardResponse(result.groups.callsign, 'START APPROVED. CONTACT TOWER FOR DEPARTURE.')
 	}
 
 	/* Push back */
-	if (result = pushbackPattern.exec(message)) {
+	if (result = execPattern(pushbackPattern, message)) {
 		return standardResponse(result.groups.callsign, 'PUSH BACK APPROVED. REPORT BACK FOR TAXI CLEARANCE.')
 	}
 
 	/* Taxi to runway */
-	if (result = taxiRunwayPattern.exec(message)) {
+	if (result = execPattern(taxiRunwayPattern, message)) {
 		return standardResponse(result.groups.callsign, `TAXI APPROVED. HOLD SHORT RUNWAY ${result.groups.runway}. CONTACT TOWER FOR DEPARTURE.`)
 	}
 
 	/* Taxi */
-	if (result = taxiPattern.exec(message)) {
+	if (result = execPattern(taxiPattern, message)) {
 		return standardResponse(result.groups.callsign, 'TAXI APPROVED. HOLD SHORT DEPARTURE RUNWAY. CONTACT TOWER FOR DEPARTURE.')
 	}
 
 	/* Takeoff (helipad) */
-	if (result = takeOffHelipadPattern.exec(message)) {
+	if (result = execPattern(takeOffHelipadPattern, message)) {
 		return standardResponse(result.groups.callsign, `CLEARED FOR TAKE OFF FROM HELIPAD ${result.groups.helipad}. ${config.atc.departureInfoHelipad}`)
 	}
 
 	/* Takeoff (runway) */
-	if (result = takeOffRunwayPattern.exec(message)) {
+	if (result = execPattern(takeOffRunwayPattern, message)) {
 		return standardResponse(result.groups.callsign, `CLEARED FOR TAKE OFF VIA RUNWAY ${result.groups.runway}. ${config.atc.departureInfoRunway}`)
 	}
 
 	/* Takeoff */
-	if (result = takeOffPattern.exec(message)) {
+	if (result = execPattern(takeOffPattern, message)) {
 		return standardResponse(result.groups.callsign, `CLEARED FOR TAKE OFF. ${config.atc.departureInfo}`)
 	}
 
 	/* Landing (helipad) */
-	if (result = landingHelipadPattern.exec(message)) {
+	if (result = execPattern(landingHelipadPattern, message)) {
 		return standardResponse(result.groups.callsign, `LANDING APPROVED ON HELIPAD ${result.groups.helipad}. ${config.atc.landingInfoHelipad}`)
 	}
 
 	/* Landing (runway) */
-	if (result = landingRunwayPattern.exec(message)) {
+	if (result = execPattern(landingRunwayPattern, message)) {
 		return standardResponse(result.groups.callsign, `LANDING APPROVED VIA RUNWAY ${result.groups.runway}. ${config.atc.landingInfoRunway}`)
 	}
 
 	/* Landing */
-	if (result = landingPattern.exec(message)) {
+	if (result = execPattern(landingPattern, message)) {
 		return standardResponse(result.groups.callsign, `LANDING APPROVED. ${config.atc.landingInfo}`)
 	}
 
 	/* Approach */
-	if (result = approachPattern.exec(message)) {
+	if (result = execPattern(approachPattern, message)) {
 		return standardResponse(result.groups.callsign, `CONTINUE APPROACH. ${config.atc.approachInfo}`)
 	}
 
 	/* Other messages with a valid callsign */
-	if (result = otherCallsignPattern.exec(message)) {
+	if (result = execPattern(otherCallsignPattern, message)) {
 		return standardResponse(result.groups.callsign, 'SAY AGAIN?')
 	}
 
 	/* Other messages with no callsign */
-	if (result = otherPattern.exec(message)) {
+	if (result = execPattern(otherPattern, message)) {
 		return `AIRCRAFT CALLING ${config.atc.handle}, SAY AGAIN WITH CALLSIGN.`
 	}
 
@@ -456,7 +462,7 @@ mqttClient.on('message', (topic, message) => {
 	logger.info(mqttMessage.message)
 
 	/* Check if the message matches the GridTalkie pattern. */
-	const result = gtMessagePattern.exec(mqttMessage.message)
+	const result = execPattern(gtMessagePattern, mqttMessage.message)
 
 	/* Ignore non-GridTalkie messages. */
 	if (result === null) {
