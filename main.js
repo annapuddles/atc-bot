@@ -44,6 +44,9 @@ const weatherCheckPattern = standardATCPattern('weather')
 const altimeterPattern = standardATCPattern('altimeter')
 const temperatureDewpointPattern = standardATCPattern('temperature|dew ?point')
 const visibilityPattern = standardATCPattern('visibility')
+const pushbackPattern = standardATCPattern('push ?back')
+const taxiPattern = standardATCPattern('taxi(?:ing)?')
+const taxiRunwayPattern = new RegExp(`^${config.atc.prefix} ?.*, ?(?<callsign>.*),.*\\b(?:taxi(?:ing)?)\\b.*\\brunway (?<runway>[0-9a-z]+ ?(?:left|right|center)?)\\b.*$`, 'gi')
 const takeOffHelipadPattern = new RegExp(`^${config.atc.prefix} ?.*, ?(?<callsign>.*),.*\\b(?:tak(?:e|ing) ?off|depart(?:ure)?)\\b.*\\bhelipad (?<helipad>[0-9a-z]+)\\b.*$`, 'gi')
 const takeOffRunwayPattern = new RegExp(`^${config.atc.prefix} ?.*, ?(?<callsign>.*),.*\\b(?:tak(?:e|ing) ?off|depart(?:ure)?)\\b.*\\brunway (?<runway>[0-9a-z]+ ?(?:left|right|center)?)\\b.*$`, 'gi')
 const landingHelipadPattern = new RegExp(`^${config.atc.prefix} ?.*, ?(?<callsign>.*),.*\\bland(?:ing)?\\b.*\\bhelipad (?<helipad>[0-9a-z]+)\\b.*$`, 'gi')
@@ -373,6 +376,21 @@ function respondToATCMessage(channel, handle, message) {
 	/* Start */
 	if (result = startPattern.exec(message)) {
 		return standardResponse(result.groups.callsign, 'START APPROVED. CONTACT TOWER FOR DEPARTURE.')
+	}
+
+	/* Push back */
+	if (result = pushbackPattern.exec(message)) {
+		return standardResponse(result.groups.callsign, 'PUSH BACK APPROVED. REPORT BACK FOR TAXI CLEARANCE.')
+	}
+
+	/* Taxi to runway */
+	if (result = taxiRunwayPattern.exec(message)) {
+		return standardResponse(result.groups.callsign, `TAXI APPROVED. HOLD SHORT RUNWAY ${result.groups.runway}. CONTACT TOWER FOR DEPARTURE.`)
+	}
+
+	/* Taxi */
+	if (result = taxiPattern.exec(message)) {
+		return standardResponse(result.groups.callsign, 'TAXI APPROVED. HOLD SHORT DEPARTURE RUNWAY. CONTACT TOWER FOR DEPARTURE.')
 	}
 
 	/* Takeoff (helipad) */
