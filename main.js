@@ -7,6 +7,7 @@ const path = require('path')
 const https = require('https')
 const { XMLParser } = require('fast-xml-parser')
 const yaml = require('yamljs')
+const qs = require('qs')
 
 /* Read settings from config.yml */
 const config = yaml.load('config.yml')
@@ -223,8 +224,10 @@ function say(channel, message) {
 		'channel': channel,
 		'message': message
 	}
+
+	const data = config.corrade.language === 'JSON' ? JSON.stringify(payload) : qs.stringify(payload)
 	
-	mqttClient.publish(`${config.corrade.group}/${config.corrade.password}/ownersay`, JSON.stringify(payload))
+	mqttClient.publish(`${config.corrade.group}/${config.corrade.password}/ownersay`, data)
 }
 
 /* Handle reconnects. */
@@ -451,7 +454,7 @@ function respondToATCMessage(channel, handle, message) {
 /* Handle MQTT messages from Corrade. */
 mqttClient.on('message', (topic, message) => {
 	/* Parse the JSON received from Corrade. */
-	let mqttMessage = JSON.parse(message)
+	let mqttMessage = config.corrade.language === 'JSON' ? JSON.parse(message) : qs.parse(message)
 
 	/* Ignore anything besides the ownersay notification. */
 	if (mqttMessage.type !== 'ownersay') {

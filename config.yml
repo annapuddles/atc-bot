@@ -17,6 +17,9 @@ corrade:
   # The corrade password for commands
   password: MyGroupPassword
 
+  # The language used for scripts, WAS or JSON
+  language: WAS
+
 # GridTalkie config
 gridtalkie:
   # Mapping of GridTalkie channels to the SL text channels that the viewer
