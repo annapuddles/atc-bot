@@ -294,10 +294,11 @@ function standardResponse(callsign, message) {
 function respondToATCMessage(channel, handle, message) {
 	let result
 
-	/* Flight plan */
-	if (result = execPattern(flightPlanPattern, message)) {
-		return standardResponse(result.groups.callsign, 'FLIGHT PLAN APPROVED. Squawk ${assignedSquawk}')
-	}
+	/* Request Flight Plan */
+if (result = execPattern(flightPlanPattern, message)) {
+	const assignedSquawk = generateConfiguredSquawk(); // <-- ADD THIS LINE
+	return standardResponse(result.groups.callsign, `FLIGHT PLAN APPROVED. Squawk ${assignedSquawk}.`);
+}
 
 	/* Radio check */
 	if (result = execPattern(radioCheckPattern, message)) {
@@ -453,6 +454,12 @@ function respondToATCMessage(channel, handle, message) {
 		return standardResponse(result.groups.callsign, `CONTINUE APPROACH. ${config.atc.approachInfo}`)
 	}
 
+	/* Request Flight Following */
+	if (result = execPattern(squawkRequestPattern, message)) {
+    const assignedSquawk = generateConfiguredSquawk();
+    return standardResponse(result.groups.callsign, `SQUAWK ${assignedSquawk} AND IDENT.`);
+	}
+
 	/* Other messages with a valid callsign */
 	if (result = execPattern(otherCallsignPattern, message)) {
 		return standardResponse(result.groups.callsign, 'SAY AGAIN?')
@@ -461,12 +468,6 @@ function respondToATCMessage(channel, handle, message) {
 	/* Other messages with no callsign */
 	if (result = execPattern(otherPattern, message)) {
 		return `AIRCRAFT CALLING ${config.atc.handle}, SAY AGAIN WITH CALLSIGN.`
-	}
-
-	/* Request Flight Following */
-	if (result = execPattern(squawkRequestPattern, message)) {
-    const assignedSquawk = generateConfiguredSquawk();
-    return standardResponse(result.groups.callsign, `SQUAWK ${assignedSquawk} AND IDENT.`);
 	}
 
 	/* Ignore messages that match no pattern */
