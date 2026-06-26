@@ -36,6 +36,7 @@ function standardATCPattern(keywords) {
  * More complex messages will need to be done as a custom regex.
  */
 const flightPlanPattern = standardATCPattern('flight ?plan')
+const squawkRequestPattern = standardATCPattern('flight ?following')
 const radioCheckPattern = standardATCPattern('radio ?(?:check|test)')
 const windCheckPattern = standardATCPattern('wind ?check')
 const startPattern = standardATCPattern('start ?(?:up)?')
