@@ -64,3 +64,52 @@ metar:
   
   # How often in milliseconds to update the METAR data
   update: 300000
+
+# Region for squawk code generation
+squawk:
+  current_region: "corsica"
+  # Region can be one of the following:
+  # - corsica
+  # - gaeta v
+  # - nautilus
+  # - satori
+  # - blake sea
+  # - heterocera
+  # - sansara
+  # - jeogot
+  # - bellisseria
+  # - military/special groups
+  regions:
+    corsica:
+      min: 0001
+      max: 0660
+    gaeta:
+      min: 0661
+      max: 1320
+    nautilus:
+      min: 1321
+      max: 1980
+    satori:
+      min: 1981
+      max: 2640
+    blake_sea:
+      min: 2641
+      max: 3300
+    heterocera:
+      min: 3301
+      max: 3960
+    sansara:
+      min: 3961
+      max: 4620
+    jeogot:
+      min: 4621
+      max: 5280
+    bellisseria:
+      min: 5281
+      max: 5940
+    military:
+      min: 5941
+      max: 6659
+# - Having a squawk code of 6660 seems to be superstitious, so it is not used.
+# - The squawk code 0000 is reserved for emergencies, so it is not used.
+# - Sqauwk codes in the 7000 range are reserved for special use, so they are not used.
