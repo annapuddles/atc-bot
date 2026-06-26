@@ -36,6 +36,7 @@ function standardATCPattern(keywords) {
  * More complex messages will need to be done as a custom regex.
  */
 const flightPlanPattern = standardATCPattern('flight ?plan')
+const squawkRequestPattern = standardATCPattern('flight ?following')
 const radioCheckPattern = standardATCPattern('radio ?(?:check|test)')
 const windCheckPattern = standardATCPattern('wind ?check')
 const startPattern = standardATCPattern('start ?(?:up)?')
@@ -59,11 +60,11 @@ const otherPattern = new RegExp(`^${config.atc.prefix}.*$`, 'gi')
 /* Create a logger instance to log messages to console and a log file. */
 const logger = winston.createLogger({
 	format: winston.format.combine(
-			winston.format.timestamp({
-				format: 'YYYY-MM-DD HH:mm:ss'
-			}),
-			winston.format.printf(info => `${info.timestamp} ${info.level}: ${info.message}`)
-		),
+		winston.format.timestamp({
+			format: 'YYYY-MM-DD HH:mm:ss'
+		}),
+		winston.format.printf(info => `${info.timestamp} ${info.level}: ${info.message}`)
+	),
 	transports: [
 		new winston.transports.Console(),
 		new winston.transports.File({
@@ -82,17 +83,32 @@ const timestampInSLT = () => {
 /* Create logger to log only the transcript of GridTalkie messages. */
 const transcript = winston.createLogger({
 	format: winston.format.combine(
-			winston.format.timestamp({
-				format: timestampInSLT
-			}),
-			winston.format.printf(info => `${info.timestamp} ${info.message}`)
-		),
+		winston.format.timestamp({
+			format: timestampInSLT
+		}),
+		winston.format.printf(info => `${info.timestamp} ${info.message}`)
+	),
 	transports: [
 		new winston.transports.File({
 			filename: path.join(path.dirname(fs.realpathSync(__filename)), config.logs.transcript)
 		})
 	]
 })
+
+/**
+ * Generates a padded 4-digit code using the min and max limits
+ * defined for the active region in config.yml.
+ */
+function generateConfiguredSquawk() {
+	const activeRegion = config.squawk?.current_region
+	const regionSettings = config.squawk?.regions?.[activeRegion]
+
+	const min = regionSettings ? parseInt(regionSettings.min) : 1
+	const max = regionSettings ? parseInt(regionSettings.max) : 660
+
+	const randomNum = Math.floor(Math.random() * (max - min + 1)) + min
+	return String(randomNum).padStart(4, '0')
+}
 
 /* Execute a RegExp pattern disregarding any state. */
 function execPattern(pattern, text) {
@@ -226,7 +242,7 @@ function say(channel, message) {
 	}
 
 	const data = config.corrade.language === 'JSON' ? JSON.stringify(payload) : qs.stringify(payload)
-	
+
 	mqttClient.publish(`${config.corrade.group}/${config.corrade.password}/ownersay`, data)
 }
 
@@ -278,9 +294,10 @@ function standardResponse(callsign, message) {
 function respondToATCMessage(channel, handle, message) {
 	let result
 
-	/* Flight plan */
+	/* Request Flight Plan */
 	if (result = execPattern(flightPlanPattern, message)) {
-		return standardResponse(result.groups.callsign, 'FLIGHT PLAN APPROVED.')
+		const assignedSquawk = generateConfiguredSquawk()
+		return standardResponse(result.groups.callsign, `FLIGHT PLAN APPROVED. SQUAWK ${assignedSquawk}.`)
 	}
 
 	/* Radio check */
@@ -353,7 +370,7 @@ function respondToATCMessage(channel, handle, message) {
 		} else {
 			return standardResponse(result.groups.callsign, noMetarMessage)
 		}
-	}
+}
 
 	/* Altimeter */
 	if (result = execPattern(altimeterPattern, message)) {
@@ -435,6 +452,12 @@ function respondToATCMessage(channel, handle, message) {
 	/* Approach */
 	if (result = execPattern(approachPattern, message)) {
 		return standardResponse(result.groups.callsign, `CONTINUE APPROACH. ${config.atc.approachInfo}`)
+	}
+
+	/* Request Flight Following */
+	if (result = execPattern(squawkRequestPattern, message)) {
+		const assignedSquawk = generateConfiguredSquawk()
+		return standardResponse(result.groups.callsign, `SQUAWK ${assignedSquawk} AND IDENT.`)
 	}
 
 	/* Other messages with a valid callsign */
