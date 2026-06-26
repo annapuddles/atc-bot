@@ -50,13 +50,14 @@ You must include the commas between each part.
 | Visibility | "SLYN tower, N12345, say visibility." | "N12345, SLYN TOWER, VISIBILITY 10 MILES." |
 | Temperature | "SLYN tower, N12345, say temperature." | "N12345, SLYN TOWER, TEMPERATURE 19. DEWPOINT 0." |
 | Altimeter | "SLYN tower, N12345, say altimeter." | "N12345, SLYN TOWER, ALTIMETER 30.02." |
-| Submitting a flight plan | "SLYN tower, N12345, flight plan SLYN > SLWS." | "N12345, SLYN TOWER, FLIGHT PLAN APPROVED." |
+| Submitting a flight plan | "SLYN tower, N12345, flight plan SLYN > SLWS." | "N12345, SLYN TOWER, FLIGHT PLAN APPROVED. SQUAWK 1824." |
 | Aircraft start-up | "SLYN tower, N12345, request start." | "N12345, SLYN TOWER, START APPROVED. CONTACT TOWER FOR DEPARTURE." |
 | Push back | "SLYN tower, N12345, request push back." | "N12345, SLYN TOWER, PUSH BACK APPROVED. REPORT BACK FOR TAXI CLEARANCE." |
 | Taxi | "SLYN tower, N12345, request clearance for taxi to runway 9." | "N12345, SLYN TOWER, TAXI APPROVED. HOLD SHORT RUNWAY 9. CONTACT TOWER FOR DEPARTURE." |
 | Take off | "SLYN  tower, N12345, request clearance for takeoff." | "N12345, SLYN TOWER, CLEARED FOR TAKE OFF." |
 | Take off from helipad | "SLYN tower, N12345, request clearance for take off from helipad H1." | "N12345, SLYN TOWER, CLEARED FOR TAKE OFF FROM HELIPAD H1." |
 | Take off from runway | "SLYN tower, N12345, request clearance for take off from runway 9." | "N12345, SLYN TOWER, CLEARED FOR TAKE OFF RUNWAY 9." |
+| Flight following | "SLYN tower, N12345, request flight following." | "N12345, SLYN TOWER, SQUAWK 1824 AND IDENT." |
 | Approach | "SLYN tower, N12345, eta 5 mins." | "N12345, SLYN TOWER, CONTINUE APPROACH." |
 | Landing | "SLYN tower, N12345, request clearance to land." | "N12345, SLYN TOWER, LANDING APPROVED." |
 | Landing on helipad | "SLYN tower, N12345, request clearance to land on helipad H1." | "N12345, SLYN TOWER, LANDING APPROVED ON HELIPAD H1." |
