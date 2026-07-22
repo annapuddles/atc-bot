@@ -285,6 +285,67 @@ function windDescription() {
 	return `${metar.wind.heading} AT ${metar.wind.speed} KNOTS`
 }
 
+function weatherInfo() {
+	let weather = `WIND ${windDescription()}. `
+
+	weather += `VISIBILITY ${metar.visibility} MILES. `
+
+	switch (metar.precipitation) {
+		case '-RA':
+			weather += 'LIGHT RAIN. '
+			break
+		case 'RA':
+			weather += 'MODERATE RAIN. '
+			break
+		case '+RA':
+			weather += 'HEAVY RAIN. '
+			break
+		case '-SN':
+			weather += 'LIGHT SNOW. '
+			break
+		case 'SN':
+			weather += 'MODERATE SNOW. '
+			break
+		case '+SN':
+			weather += 'HEAVY SNOW. '
+			break
+	}
+
+	weather += 'CLOUDS '
+	switch (metar.clouds.type) {
+		case 'CLR':
+			weather += 'CLEAR'
+			break
+		case 'FEW':
+			weather += 'FEW'
+			break
+		case 'SCT':
+			weather += 'SCATTERED'
+			break
+		case 'BKN':
+			weather += 'BROKEN'
+			break
+		case 'OVC':
+			weather += 'OVERCAST'
+			break
+	}
+	weather += ` AT ${metar.clouds.ceiling} FEET. `
+
+	weather += `TEMPERATURE ${formatMetarTemp(metar.temperature)}. `
+	weather += `DEWPOINT ${formatMetarTemp(metar.dewpoint)}. `
+	weather += `ALTIMETER ${metar.altimeter}.`
+
+	return weather;
+}
+
+if (config.atis.enabled) {
+	setInterval(() => {
+		if (metar) {
+			say(config.atis.channel, `${metar.icao} INFORMATION, TIME ${metar.time.hour}${metar.time.minute} ZULU OBSERVATION. ${weatherInfo()}`)
+		}
+	}, config.atis.interval)
+}
+
 /* Format a standard ATC response to the specified callsign. */
 function standardResponse(callsign, message) {
 	return `${callsign}, ${config.atc.handle}, ${message}`
@@ -317,56 +378,7 @@ function respondToATCMessage(channel, handle, message) {
 	/* Weather */
 	if (result = execPattern(weatherCheckPattern, message)) {
 		if (metar) {
-			let weather = `WIND ${windDescription()}. `
-
-			weather += `VISIBILITY ${metar.visibility} MILES. `
-
-			switch (metar.precipitation) {
-				case '-RA':
-					weather += 'LIGHT RAIN. '
-					break
-				case 'RA':
-					weather += 'MODERATE RAIN. '
-					break
-				case '+RA':
-					weather += 'HEAVY RAIN. '
-					break
-				case '-SN':
-					weather += 'LIGHT SNOW. '
-					break
-				case 'SN':
-					weather += 'MODERATE SNOW. '
-					break
-				case '+SN':
-					weather += 'HEAVY SNOW. '
-					break
-			}
-
-			weather += 'CLOUDS '
-			switch (metar.clouds.type) {
-				case 'CLR':
-					weather += 'CLEAR'
-					break
-				case 'FEW':
-					weather += 'FEW'
-					break
-				case 'SCT':
-					weather += 'SCATTERED'
-					break
-				case 'BKN':
-					weather += 'BROKEN'
-					break
-				case 'OVC':
-					weather += 'OVERCAST'
-					break
-			}
-			weather += ` AT ${metar.clouds.ceiling} FEET. `
-
-			weather += `TEMPERATURE ${formatMetarTemp(metar.temperature)}. `
-			weather += `DEWPOINT ${formatMetarTemp(metar.dewpoint)}. `
-			weather += `ALTIMETER ${metar.altimeter}.`
-
-			return standardResponse(result.groups.callsign, `LATEST WEATHER INFORMATION: ${weather}`)
+			return standardResponse(result.groups.callsign, `LATEST WEATHER INFORMATION: ${weatherInfo()}`)
 		} else {
 			return standardResponse(result.groups.callsign, noMetarMessage)
 		}
