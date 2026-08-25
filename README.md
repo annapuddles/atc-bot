@@ -72,3 +72,5 @@ A working example of this bot is running at Hyena Heliport (SLYN), and can be in
 | #12755  | Hyena Heliport (SLYN) tower |
 | #12270  | Gridwide ATC                |
 | #11920  | Blake Sea ATC               |
+
+The SLYN ATC bot also listens on (but does not respond to) several other ATC-related channels, and you can view the public transcript of GridTalkie ATC messages here: https://annapuddles.com/slyn/transcript
