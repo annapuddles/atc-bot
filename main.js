@@ -55,6 +55,7 @@ const landingHelipadPattern = new RegExp(`^${config.atc.prefix} ?.*, ?(?<callsig
 const landingRunwayPattern = new RegExp(`^${config.atc.prefix} ?.*, ?(?<callsign>.*),.*\\bland(?:ing)?\\b.*\\brunway (?<runway>[0-9a-z]+ ?(?:left|right|center)?)\\b.*$`, 'gi')
 const approachPattern = standardATCPattern('approach|eta')
 const otherCallsignPattern = new RegExp(`^${config.atc.prefix} ?.*, ?(?<callsign>.*),.*$`, 'gi')
+const callsignNoRequestPattern = new RegExp(`^${config.atc.prefix} ?.*, ?(?<callsign>.*).*$`, 'gi')
 const otherPattern = new RegExp(`^${config.atc.prefix}.*$`, 'gi')
 
 /* Create a logger instance to log messages to console and a log file. */
@@ -475,6 +476,11 @@ function respondToATCMessage(channel, handle, message) {
 	/* Other messages with a valid callsign */
 	if (result = execPattern(otherCallsignPattern, message)) {
 		return standardResponse(result.groups.callsign, 'SAY AGAIN?')
+	}
+
+	/* Valid callsign but no request. */
+	if (result = execPattern(callsignNoRequestPattern, message)) {
+		return standardResponse(result.groups.callsign, 'SAY REQUEST.')
 	}
 
 	/* Other messages with no callsign */
