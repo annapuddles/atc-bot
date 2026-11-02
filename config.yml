@@ -36,6 +36,9 @@ atc:
   # The prefix that messages must start with for the bot to reply
   prefix: ICAO
 
+  # General facility information
+  generalInfo: "REFER TO https://github.com/annapuddles/atc-bot#messages FOR INSTRUCTIONS ON INTERACTING WITH ATC AT THIS FACILITY."
+
   # Extra information given with generic departure clearances
   departureInfo: ""
 

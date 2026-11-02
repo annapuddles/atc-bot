@@ -54,6 +54,7 @@ const takeOffRunwayPattern = new RegExp(`^${config.atc.prefix} ?.*, ?(?<callsign
 const landingHelipadPattern = new RegExp(`^${config.atc.prefix} ?.*, ?(?<callsign>.*),.*\\bland(?:ing)?\\b.*\\bhelipad (?<helipad>[0-9a-z]+)\\b.*$`, 'gi')
 const landingRunwayPattern = new RegExp(`^${config.atc.prefix} ?.*, ?(?<callsign>.*),.*\\bland(?:ing)?\\b.*\\brunway (?<runway>[0-9a-z]+ ?(?:left|right|center)?)\\b.*$`, 'gi')
 const approachPattern = standardATCPattern('approach|eta')
+const infoPattern = standardATCPattern('info(?:rmation)?')
 const otherCallsignPattern = new RegExp(`^${config.atc.prefix} ?.*, ?(?<callsign>.*),.*$`, 'gi')
 const callsignNoRequestPattern = new RegExp(`^${config.atc.prefix} ?.*, ?(?<callsign>.*).*$`, 'gi')
 const otherPattern = new RegExp(`^${config.atc.prefix}.*$`, 'gi')
@@ -471,6 +472,11 @@ function respondToATCMessage(channel, handle, message) {
 	if (result = execPattern(squawkRequestPattern, message)) {
 		const assignedSquawk = generateConfiguredSquawk()
 		return standardResponse(result.groups.callsign, `SQUAWK ${assignedSquawk} AND IDENT.`)
+	}
+
+	/* General information request */
+	if (result = execPattern(infoPattern, message)) {
+		return standardResponse(result.groups.callsign, config.atc.generalInfo)
 	}
 
 	/* Other messages with a valid callsign */
